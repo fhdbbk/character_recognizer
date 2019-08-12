@@ -34,8 +34,9 @@ class Predictor:
                 max_prob_idx = i
         return max_prob_idx
 
-    def predict(self, image_file):
-        image = cv2.imread(image_file, 0)
+    def predict(self, image):
+        #image = cv2.imread(image_file, 0)
+
         image = cv2.resize(image, (32, 32))
         image = normalize_images(image)
         image_vector = np.reshape(image, (1, 32, 32, 1))

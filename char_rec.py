@@ -3,6 +3,7 @@ import numpy as np
 from predictor import Predictor
 from PIL import ImageGrab
 import os
+import cv2
 
 IMAGE_FOLDER = 'temp'
 
@@ -12,7 +13,7 @@ class MainWindow(tk.Frame):
         super(MainWindow, self).__init__(master)
         self.pack()
         self.master.title("Character Recognizer")
-        self.drawing_canvas = tk.Canvas(self, width=320, height=180)
+        self.drawing_canvas = tk.Canvas(self, width=320, height=180, bg='black')
         self.drawing_canvas.pack()
         self.drawing_canvas.bind('<Button-1>', self.click)
         self.drawing_canvas.bind('<B1-Motion>', self.move)
@@ -36,6 +37,16 @@ class MainWindow(tk.Frame):
     def clear_canvas(self, event):
         self.drawing_canvas.delete('all')
 
+    def extract_digit(self, img):
+        row_vals, col_vals = np.where(img == 255)
+        min_row = np.min(row_vals)
+        max_row = np.max(row_vals)
+        min_col = np.min(col_vals)
+        max_col = np.max(col_vals)
+        cropped_image = img[min_row - 10: max_row + 10,
+                            min_col - 10: max_col + 10]
+        return cropped_image
+
     def make_prediction(self, event):
         self.image_id += 1
         image_path = os.path.join(IMAGE_FOLDER,
@@ -44,11 +55,14 @@ class MainWindow(tk.Frame):
         y = self.master.winfo_rooty() + self.drawing_canvas.winfo_y()
         x1 = x + self.drawing_canvas.winfo_width()
         y1 = y + self.drawing_canvas.winfo_height()
-        img = ImageGrab.grab().crop((x, y, x1, y1))
-        img.save(image_path)
+        img = ImageGrab.grab().crop((x, y, x1, y1)).convert("RGB")
         image = np.array(img)
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        image = self.extract_digit(image)
+        #image.save(image_path)
+        cv2.imwrite(image_path, image)
         print("Numpy array shape is: {}".format(image.shape))
-        prediction = self.predictor.predict(image_path)
+        prediction = self.predictor.predict(image)
         self.result.config(text=str(prediction))
 
     def click(self, event):
@@ -56,7 +70,8 @@ class MainWindow(tk.Frame):
 
     def move(self, event):
         self.drawing_canvas.create_line(self.prev.x, self.prev.y,
-                                        event.x, event.y, width=5)
+                                        event.x, event.y,
+                                        width=15, fill='white')
         self.prev = event
 
     def perform_cleanup(self):
