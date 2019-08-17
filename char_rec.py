@@ -13,9 +13,10 @@ class MainWindow(tk.Frame):
         super(MainWindow, self).__init__(master)
         self.pack()
         self.master.title("Character Recognizer")
-        self.drawing_canvas = tk.Canvas(self, width=320, height=180, bg='black')
+        self.drawing_canvas = tk.Canvas(self, width=320,
+                                        height=180, bg='black')
         self.drawing_canvas.pack()
-        self.drawing_canvas.bind('<Button-1>', self.click)
+        # self.drawing_canvas.bind('<Button-1>', self.click)
         self.drawing_canvas.bind('<B1-Motion>', self.move)
         self.bottom_frame = tk.Frame(self)
         self.bottom_frame.pack(side='bottom', padx=15, pady=15)
@@ -65,14 +66,14 @@ class MainWindow(tk.Frame):
         prediction = self.predictor.predict(image)
         self.result.config(text=str(prediction))
 
-    def click(self, event):
-        self.prev = event
-
     def move(self, event):
-        self.drawing_canvas.create_line(self.prev.x, self.prev.y,
-                                        event.x, event.y,
-                                        width=15, fill='white')
-        self.prev = event
+        # self.drawing_canvas.line(self.prev.x, self.prev.y,
+        #                                 event.x, event.y,
+        #                                 width=10, fill='white')
+        x1, y1 = event.x - 5, event.y - 5
+        x2, y2 = event.x + 5, event.y + 5
+        self.drawing_canvas.create_oval(x1, y1, x2, y2,
+                                        outline='white', fill='white')
 
     def perform_cleanup(self):
         self.predictor.close_session()

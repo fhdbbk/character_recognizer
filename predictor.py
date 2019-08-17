@@ -6,7 +6,8 @@ from architecture import Lenet
 
 
 def normalize_images(x):
-    x = (x - 128) / 256.0
+    #x = (x - 128) / 256.0
+    x = x / 255.0
     return x
 
 
@@ -35,9 +36,10 @@ class Predictor:
         return max_prob_idx
 
     def predict(self, image):
-        #image = cv2.imread(image_file, 0)
+        #image = scv2.imread(image_file, 0)
 
         image = cv2.resize(image, (32, 32))
+        image = np.reshape(image, (32, 32, 1))
         image = normalize_images(image)
         image_vector = np.reshape(image, (1, 32, 32, 1))
         pred = tf.nn.softmax(self.logits)
