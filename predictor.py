@@ -1,12 +1,11 @@
 import numpy as np
 import cv2
-import os
 import tensorflow as tf
 from architecture import Lenet
 
 
 def normalize_images(x):
-    #x = (x - 128) / 256.0
+    # x = (x - 128) / 256.0
     x = x / 255.0
     return x
 
@@ -36,7 +35,7 @@ class Predictor:
         return max_prob_idx
 
     def predict(self, image):
-        #image = scv2.imread(image_file, 0)
+        # image = scv2.imread(image_file, 0)
 
         image = cv2.resize(image, (32, 32))
         image = np.reshape(image, (32, 32, 1))
@@ -56,11 +55,8 @@ class Predictor:
         self.sess.close()
         print("Tensorflow session closed")
 
+
 if __name__ == '__main__':
     predictor = Predictor()
     image_file = 'temp/img1.png'
     predictor.predict(image_file)
-
-
-
-
